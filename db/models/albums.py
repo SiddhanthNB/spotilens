@@ -1,7 +1,7 @@
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from db.models.base_model import BaseModel
-from sqlalchemy import Column, Text, Integer, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, Text, Integer, DateTime, JSON, ForeignKey, Table
 
 class Album(BaseModel):
     __tablename__ = "spotilens__albums"
@@ -20,9 +20,8 @@ class Album(BaseModel):
     href = Column(Text, nullable=True)
     uri = Column(Text, nullable=True)
     type = Column(Text, nullable=True)
-    artist_id = Column(Text, ForeignKey("spotilens__artists.artist_id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
 
-    artist = relationship("Artist", back_populates="albums")
+    artists = relationship("Artist", secondary="spotilens__album_artists", back_populates="albums")
     tracks = relationship("Track", back_populates="album", cascade="all, delete-orphan")

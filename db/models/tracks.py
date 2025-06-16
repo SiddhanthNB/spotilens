@@ -20,10 +20,9 @@ class Track(BaseModel):
     uri = Column(Text, nullable=True)
     type = Column(Text, nullable=True)
     album_id = Column(Text, ForeignKey("spotilens__albums.album_id"), nullable=False)
-    artist_id = Column(Text, ForeignKey("spotilens__artists.artist_id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
 
     album = relationship("Album", back_populates="tracks")
-    artist = relationship("Artist", back_populates="tracks")
+    artists = relationship("Artist", secondary="spotilens__track_artists", back_populates="tracks")
     plays = relationship("ListeningHistory", back_populates="track", cascade="all, delete-orphan")

@@ -19,5 +19,5 @@ class Artist(BaseModel):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
 
-    albums = relationship("Album", back_populates="artist", cascade="all, delete-orphan")
-    tracks = relationship("Track", back_populates="artist", cascade="all, delete-orphan")
+    albums = relationship("Album", secondary="spotilens__album_artists", back_populates="artists")
+    tracks = relationship("Track", secondary="spotilens__track_artists", back_populates="artists")
