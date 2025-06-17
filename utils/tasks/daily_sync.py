@@ -23,7 +23,8 @@ def _sync_recently_played(spotify_service):
     }
     try:
         response = spotify_service.fetch_recently_played()
-        [ store_spotify_track_in_db(item, 'daily-sync') for item in response['items'] ]
+        sorted_items = sorted(response['items'], key=lambda x: x['played_at'])
+        [ store_spotify_track_in_db(item, 'daily-sync') for item in sorted_items ]
         log_payload['status'] = True
     except Exception as e:
         logger.error(f'Could not sync with spotify: {str(e)}')

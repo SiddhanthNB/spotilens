@@ -1,5 +1,6 @@
 import requests
 import base64
+from datetime import datetime
 from config.logger import logger
 import utils.constants as constants
 from typing import Dict, Optional, Any
@@ -18,17 +19,14 @@ class SpotifyService:
         """
         auth_str = f"{self.client_id}:{self.client_secret}"
         b64_auth_str = base64.b64encode(auth_str.encode()).decode()
-
         headers = {
             "Authorization": f"Basic {b64_auth_str}",
             "Content-Type": "application/x-www-form-urlencoded"
         }
-
         data = {
             "grant_type": "refresh_token",
             "refresh_token": self.refresh_token
         }
-
         response = requests.post("https://accounts.spotify.com/api/token", headers=headers, data=data)
         response.raise_for_status()
         access_token = response.json()["access_token"]
@@ -39,12 +37,13 @@ class SpotifyService:
         if not self.access_token:
             self.access_token = self._get_access_token()
 
-    def fetch_recently_played(self, limit: int = 50) -> Optional[Dict[str, Any]]:
+    def fetch_recently_played(self, limit: int = 50, cutoff_timestamp: str = '2025-06-10T00:00:00.000Z') -> Optional[Dict[str, Any]]:
         """
         Fetch recently played tracks from Spotify API
         """
         url = f"{self.base_url}/me/player/recently-played"
-        params = {"limit": limit}
+        cutoff_timestamp_dt = datetime.fromisoformat(cutoff_timestamp.replace('Z', '+00:00'))
+        params = {"limit": limit, "after": int(cutoff_timestamp_dt.timestamp() * 1000)}
 
         self._ensure_valid_token()
         headers = {
