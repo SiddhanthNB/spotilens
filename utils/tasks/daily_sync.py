@@ -5,7 +5,7 @@ from utils.spotify_service import SpotifyService
 from utils.helper import store_spotify_track_in_db
 
 @task()
-def sync_data_with_spotify():
+def sync_data_with_spotify(ctx):
     spotify_service = SpotifyService()
 
     _sync_recently_played(spotify_service)

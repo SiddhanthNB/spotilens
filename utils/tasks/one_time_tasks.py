@@ -4,7 +4,7 @@ from config.logger import logger
 from utils.helper import store_spotify_track_in_db
 
 @task()
-def create_tables_in_db():
+def create_tables_in_db(ctx):
     from db.models.albums import Album
     from db.models.artists import Artist
     from db.models.tracks import Track
@@ -20,7 +20,7 @@ def create_tables_in_db():
     Base.metadata.create_all(engine)
 
 @task()
-def populate_db_with_historical_listening_data():
+def populate_db_with_historical_listening_data(ctx):
     logger.setLevel('WARNING')
 
     with open('data/final_listening_history.json', 'r') as f:
