@@ -1,3 +1,4 @@
+from sqlalchemy import inspect
 from config.logger import logger
 from config.postgres import get_session
 from datetime import datetime, timezone
@@ -60,7 +61,8 @@ class BaseModel(Base):
 		try:
 			filters = filters or {}
 			with _session() as session:
-				return session.query(func.count(cls.id)).filter_by(**filters).scalar()
+				pk_column = inspect(cls).primary_key[0]
+				return session.query(func.count(pk_column)).filter_by(**filters).scalar()
 		except Exception as e:
 			logger.error(f"Error: {e}", exc_info=True)
 			return False
@@ -70,7 +72,8 @@ class BaseModel(Base):
 		"""Fetch the first records by the given count."""
 		try:
 			with _session() as session:
-				query = session.query(cls).order_by(asc(cls.id)).limit(count)
+				pk_column = inspect(cls).primary_key[0]
+				query = session.query(cls).order_by(asc(pk_column)).limit(count)
 				return query.first() if count == 1 else query.all()
 		except Exception as e:
 			logger.error(f"Error: {e}", exc_info=True)
@@ -81,7 +84,8 @@ class BaseModel(Base):
 		"""Fetch the last records by the given count."""
 		try:
 			with _session() as session:
-				query = session.query(cls).order_by(desc(cls.id)).limit(count)
+				pk_column = inspect(cls).primary_key[0]
+				query = session.query(cls).order_by(desc(pk_column)).limit(count)
 				return query.first() if count == 1 else query.all()
 		except Exception as e:
 			logger.error(f"Error: {e}", exc_info=True)
