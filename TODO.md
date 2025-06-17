@@ -5,6 +5,7 @@
 - [ ] Setup Alembic for this project
 - [ ] rename column name status -> success in sync_logs
 - [ ] add column track_name in listening_history table
+- [ ] handle empty track, album, artists names in db, if any
 
 ## In Progress
 - [ ] Automate sync jobs in github actions
