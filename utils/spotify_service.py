@@ -29,15 +29,11 @@ class SpotifyService:
             "refresh_token": self.refresh_token
         }
 
-        try:
-            response = requests.post("https://accounts.spotify.com/api/token", headers=headers, data=data)
-            response.raise_for_status()
-            access_token = response.json()["access_token"]
-            logger.info("Successfully generated new access token")
-            return access_token
-        except Exception as e:
-            logger.error(f"Error generating access token: {e}")
-            raise Exception(f"Failed to generate access token: {e}")
+        response = requests.post("https://accounts.spotify.com/api/token", headers=headers, data=data)
+        response.raise_for_status()
+        access_token = response.json()["access_token"]
+        logger.info("Successfully generated new access token")
+        return access_token
 
     def _ensure_valid_token(self) -> None:
         if not self.access_token:
@@ -50,19 +46,15 @@ class SpotifyService:
         url = f"{self.base_url}/me/player/recently-played"
         params = {"limit": limit}
 
-        try:
-            self._ensure_valid_token()
-            headers = {
-                "Authorization": f"Bearer {self.access_token}",
-                "Content-Type": "application/json"
-            }
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-            logger.info(f"Successfully fetched {limit} recently played tracks")
-            return response.json()
-        except Exception as e:
-            logger.error(f"Error fetching recently played tracks: {e}")
-            return None
+        self._ensure_valid_token()
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        logger.info(f"Successfully fetched {limit} recently played tracks")
+        return response.json()
 
     def fetch_artists(self):
         pass

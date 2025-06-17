@@ -9,7 +9,7 @@ from db.models.album_artists import AlbumArtist
 from db.models.track_artists import TrackArtist
 from db.models.listening_history import ListeningHistory
 
-def store_spotify_track_in_db(payload: Dict[str, Any]) -> ListeningHistory:
+def store_spotify_track_in_db(payload: Dict[str, Any], record_type: Optional[str] = 'daily-sync') -> ListeningHistory:
     # Extract track.id and played_at timestamp
     track_data = payload.get('track', {})
     track_id = track_data.get('id')
@@ -74,6 +74,7 @@ def store_spotify_track_in_db(payload: Dict[str, Any]) -> ListeningHistory:
     listening_history = create_listening_history(
         track_id=track.track_id,
         played_at=played_at_dt,
+        record_type=record_type,
         context_type=context_data.get('type'),
         context_uri=context_data.get('uri')
     )
@@ -241,12 +242,12 @@ def get_or_create_track(track_data: Dict[str, Any], album_id: str, track_artist_
     return track
 
 
-def create_listening_history(track_id: str, played_at: datetime, context_type: Optional[str] = None, context_uri: Optional[str] = None) -> ListeningHistory:
+def create_listening_history(track_id: str, played_at: datetime, record_type: str, context_type: Optional[str] = None, context_uri: Optional[str] = None) -> ListeningHistory:
     listening_history_data = {
         'track_id': track_id,
         'context_type': context_type,
         'context_uri': context_uri,
-        'record_type': 'daily-sync',
+        'record_type': record_type,
         'played_at': played_at
     }
 
