@@ -1,5 +1,6 @@
 import requests
 import base64
+import time
 from datetime import datetime
 from config.logger import logger
 import utils.constants as constants
@@ -13,9 +14,9 @@ class SpotifyService:
         self.refresh_token = constants.SPOTIFY_REFRESH_TOKEN
         self.base_url = "https://api.spotify.com/v1"
 
-    def _get_access_token(self) -> str:
+    def _get_access_token(self, max_retries: int = 5) -> str:
         """
-        Generate access token using client credentials and refresh token
+        Generate access token using client credentials and refresh token with retry logic
         """
         auth_str = f"{self.client_id}:{self.client_secret}"
         b64_auth_str = base64.b64encode(auth_str.encode()).decode()
@@ -27,11 +28,27 @@ class SpotifyService:
             "grant_type": "refresh_token",
             "refresh_token": self.refresh_token
         }
-        response = requests.post("https://accounts.spotify.com/api/token", headers=headers, data=data)
-        response.raise_for_status()
-        access_token = response.json()["access_token"]
-        logger.info("Successfully generated new access token")
-        return access_token
+
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    "https://accounts.spotify.com/api/token",
+                    headers=headers,
+                    data=data,
+                    timeout=10
+                )
+                response.raise_for_status()
+                access_token = response.json()["access_token"]
+                logger.info("Successfully generated new access token")
+                return access_token
+            except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Failed to get access token after {max_retries} attempts: {str(e)}")
+                    raise
+
+                wait_time = (2 ** attempt) + (0.1 * attempt)
+                logger.warning(f"Access token request failed (attempt {attempt + 1}/{max_retries}), retrying in {wait_time:.1f}s: {str(e)}")
+                time.sleep(wait_time)
 
     def _ensure_valid_token(self) -> None:
         if not self.access_token:
