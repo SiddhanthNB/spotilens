@@ -73,6 +73,7 @@ def store_spotify_track_in_db(payload: Dict[str, Any], record_type: Optional[str
     context_data = payload.get('context', {})
     listening_history = create_listening_history(
         track_id=track.track_id,
+        track_name=track.name,
         played_at=played_at_dt,
         record_type=record_type,
         context=context_data
@@ -241,11 +242,12 @@ def get_or_create_track(track_data: Dict[str, Any], album_id: str, track_artist_
     return track
 
 
-def create_listening_history(track_id: str, played_at: datetime, record_type: str, context: Optional[dict] = None) -> ListeningHistory:
+def create_listening_history(track_id: str, played_at: datetime, record_type: str, track_name: Optional[str] = None, context: Optional[dict] = None) -> ListeningHistory:
     context_type = context.get('type') if context else None
     context_uri = context.get('uri') if context else None
     listening_history_data = {
         'track_id': track_id,
+        'track_name': track_name,
         'context_type': context_type,
         'context_uri': context_uri,
         'record_type': record_type,

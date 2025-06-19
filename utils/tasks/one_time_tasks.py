@@ -1,6 +1,7 @@
 import json
 from invoke.tasks import task
 from config.logger import logger
+from config.postgres import db_session, close_session
 from utils.helper import store_spotify_track_in_db
 
 @task()
@@ -35,3 +36,32 @@ def populate_db_with_historical_listening_data(ctx):
         except Exception as e:
             print(f"Error processing track with id {item.get('track', {}).get('id')}: {e}")
             print('continuing...')
+    close_session()
+
+@task()
+def populate_track_names_bulk():
+    try:
+        # Raw SQL query to update track_name from tracks table
+        # CORRECTED: Proper explicit JOIN syntax for PostgreSQL UPDATE
+        update_query = """
+            UPDATE spotilens__listening_history
+            SET track_name = t.name, updated_at = NOW()
+            FROM spotilens__tracks t
+            WHERE spotilens__listening_history.track_id = t.track_id
+            AND spotilens__listening_history.track_name IS NULL
+        """
+
+        result = db_session.execute(update_query)
+        db_session.commit()
+
+        rows_updated = result.rowcount
+        logger.info(f"Bulk update completed. Updated {rows_updated} records with track names")
+
+        return True
+
+    except Exception as e:
+        logger.error(f"Error in populate_track_names_bulk: {e}", exc_info=True)
+        db_session.rollback()
+        return False
+    finally:
+        db_session.close()
