@@ -9,6 +9,7 @@ class ListeningHistory(BaseModel):
 
     play_id = Column(Integer, primary_key=True, autoincrement=True)
     track_id = Column(Text, ForeignKey("spotilens__tracks.track_id"), nullable=False)
+    track_name = Column(Text, nullable=True)
     context_type = Column(Text, nullable=True)
     context_uri = Column(Text, nullable=True)
     record_type = Column(Text, nullable=False)  # 'historical-data' or 'daily-sync'

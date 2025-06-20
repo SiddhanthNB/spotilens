@@ -1,6 +1,7 @@
 from invoke.tasks import task
 from config.logger import logger
 from db.models.sync_logs import SyncLog
+from config.postgres import close_session
 from utils.spotify_service import SpotifyService
 from utils.helper import store_spotify_track_in_db
 
@@ -32,6 +33,7 @@ def _sync_recently_played(spotify_service):
         log_payload['status'] = False
     finally:
         SyncLog.create_record(log_payload)
+        close_session()
 
 def _sync_artists(spotify_service):
     pass
