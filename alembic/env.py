@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from utils.constants import SUPABASE_DB_URL
+from utils.constants import SUPABASE_DB_URL, PROJECT_NAME
 from db.models.base_model import Base
 import db.models
 
@@ -26,6 +26,9 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# Dynamic version table name based on project
+VERSION_TABLE = f"{PROJECT_NAME.lower()}__alembic_version"
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -45,6 +48,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_table=VERSION_TABLE
     )
 
     with context.begin_transaction():
@@ -64,7 +68,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            version_table=VERSION_TABLE
         )
 
         with context.begin_transaction():

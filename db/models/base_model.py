@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from sqlalchemy import func, asc, desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
-from sqlalchemy.orm.exc import DetachedInstanceError
 
 Base = declarative_base()
 
@@ -126,7 +125,7 @@ class BaseModel(Base):
 			return False
 
 	def destroy(self):
-		"""Delete current instance (ActiveRecord-style)"""
+		"""Delete current instance"""
 		try:
 			db_session.delete(self)
 			db_session.commit()
