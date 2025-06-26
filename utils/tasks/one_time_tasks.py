@@ -3,6 +3,7 @@ from invoke.tasks import task
 from config.logger import logger
 from config.postgres import db_session, close_session
 from utils.helper import store_spotify_track_in_db
+from sqlalchemy import text
 
 @task()
 def create_tables_in_db(ctx):
@@ -39,7 +40,7 @@ def populate_db_with_historical_listening_data(ctx):
     close_session()
 
 @task()
-def populate_track_names_bulk():
+def populate_track_names_bulk(ctx):
     try:
         # Raw SQL query to update track_name from tracks table
         # CORRECTED: Proper explicit JOIN syntax for PostgreSQL UPDATE
@@ -51,7 +52,7 @@ def populate_track_names_bulk():
             AND spotilens__listening_history.track_name IS NULL
         """
 
-        result = db_session.execute(update_query)
+        result = db_session.execute(text(update_query))
         db_session.commit()
 
         rows_updated = result.rowcount
