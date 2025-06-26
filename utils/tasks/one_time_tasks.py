@@ -1,9 +1,9 @@
 import json
+from sqlalchemy import text
 from invoke.tasks import task
 from config.logger import logger
-from config.postgres import db_session, close_session
 from utils.helper import store_spotify_track_in_db
-from sqlalchemy import text
+from config.postgres import db_session, close_session, execute_query
 
 @task()
 def create_tables_in_db(ctx):
@@ -52,11 +52,9 @@ def populate_track_names_bulk(ctx):
             AND spotilens__listening_history.track_name IS NULL
         """
 
-        result = db_session.execute(text(update_query))
-        db_session.commit()
+        result = execute_query(update_query)
 
-        rows_updated = result.rowcount
-        logger.info(f"Bulk update completed. Updated {rows_updated} records with track names")
+        logger.info(f"Bulk update completed. Updated {result.get('rows_affected', 0)} records with track names.")
 
         return True
 

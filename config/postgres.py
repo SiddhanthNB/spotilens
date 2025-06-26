@@ -30,12 +30,13 @@ def close_session():
 			pass
 
 def execute_query(raw_query, params = None):
-	res = { 'rows': [], 'columns': [], 'rows_affected': 0, 'raw_result': None }
+	res = {}
 	try:
 		with _engine.connect() as connection:
 			result = connection.execute(text(raw_query), params)
 			res['raw_result'] = result
-			res['rows_affected'] = result.rowcount
+			if result.rowcount is not None:
+				res['rows_affected'] = result.rowcount
 			if result.returns_rows:
 				res['columns'] = list(result.keys())
 				res['rows'] = [ tuple(row) for row in result.fetchall() ]
