@@ -12,7 +12,7 @@ class ListeningHistory(BaseModel):
     track_name = Column(Text, nullable=True)
     context_type = Column(Text, nullable=True)
     context_uri = Column(Text, nullable=True)
-    record_type = Column(Text, nullable=False)  # 'historical-data' or 'daily-sync'
+    entry_type = Column(Text, nullable=False)  # 'historical-data' or 'daily-sync'
     played_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
