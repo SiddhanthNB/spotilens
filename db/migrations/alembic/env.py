@@ -39,8 +39,7 @@ VERSION_TABLE = f"{PROJECT_NAME.lower()}__alembic_version"
 def include_object(object, name, type_, reflected, compare_to):
     """Only include objects that belong to this project"""
     if type_ == "table":
-        project_prefix = PROJECT_NAME.lower().split('__')[0]
-        return name.startswith(project_prefix)
+        return name.startswith(PROJECT_NAME.lower())
     return True
 
 
