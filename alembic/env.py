@@ -30,6 +30,14 @@ target_metadata = Base.metadata
 VERSION_TABLE = f"{PROJECT_NAME.lower()}__alembic_version"
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    """Only include objects that belong to this project"""
+    if type_ == "table":
+        project_prefix = PROJECT_NAME.lower().split('__')[0]
+        return name.startswith(project_prefix)
+    return True
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -48,7 +56,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        version_table=VERSION_TABLE
+        version_table=VERSION_TABLE,
+        include_object=include_object
     )
 
     with context.begin_transaction():
@@ -70,7 +79,8 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            version_table=VERSION_TABLE
+            version_table=VERSION_TABLE,
+            include_object=include_object
         )
 
         with context.begin_transaction():
