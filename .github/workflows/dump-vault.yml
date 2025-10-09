@@ -1,0 +1,23 @@
+name: dump-vault
+on: workflow_dispatch
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create .env file from GitHub Secrets
+        run: |
+          {
+            echo "SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}"
+            echo "SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}"
+            echo "SPOTIFY_REDIRECT_URI=${{ secrets.SPOTIFY_REDIRECT_URI }}"
+            echo "SPOTIFY_REFRESH_TOKEN=${{ secrets.SPOTIFY_REFRESH_TOKEN }}"
+            echo "SPOTIFY_SCOPE=${{ secrets.SPOTIFY_SCOPE }}"
+          } > secrets.env
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotify-secrets
+          path: secrets.env
+          if-no-files-found: error
